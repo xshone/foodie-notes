@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next"
 import { Geist } from "next/font/google"
+import { ThemeProvider } from "next-themes"
 import "./globals.css"
 
 const geistSans = Geist({
@@ -24,9 +25,16 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="zh" className={geistSans.variable}>
+    <html lang="zh" className={geistSans.variable} suppressHydrationWarning>
       <body className="antialiased min-h-screen bg-background text-foreground font-sans">
-        {children}
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   )

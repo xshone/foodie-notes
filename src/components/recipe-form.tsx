@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
 import { PlusIcon, TrashIcon, XIcon } from "lucide-react"
+import { ImageUpload } from "@/components/image-upload"
 
 const CATEGORIES = ["家常菜", "早餐", "汤粥", "烘焙甜点", "凉菜", "火锅", "西餐", "饮品", "其他"]
 const DIFFICULTIES = [
@@ -37,6 +38,7 @@ export function RecipeForm() {
   const [prepTime, setPrepTime] = useState("")
   const [cookTime, setCookTime] = useState("")
   const [notes, setNotes] = useState("")
+  const [imageUrl, setImageUrl] = useState("")
   const [tagInput, setTagInput] = useState("")
   const [tags, setTags] = useState<string[]>([])
   const [ingredients, setIngredients] = useState<IngredientItem[]>([
@@ -85,6 +87,7 @@ export function RecipeForm() {
         cookTime: cookTime ? parseInt(cookTime) : undefined,
         notes: notes.trim() || undefined,
         tags,
+        imageUrl: imageUrl.trim() || undefined,
         ingredients: ingredients.filter((i) => i.name.trim()),
         steps: steps.filter((s) => s.text.trim()),
       })
@@ -120,6 +123,12 @@ export function RecipeForm() {
               className="mt-1 resize-none"
               rows={2}
             />
+          </div>
+          <div>
+            <Label>菜谱图片</Label>
+            <div className="mt-1">
+              <ImageUpload value={imageUrl} onChange={setImageUrl} />
+            </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>

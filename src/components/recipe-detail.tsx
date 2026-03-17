@@ -2,12 +2,19 @@
 
 import { useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
-import { deleteRecipe, toggleFavorite, type IngredientItem, type StepItem } from "@/actions/recipe"
+import {
+  deleteRecipe,
+  toggleFavorite,
+  updateRecipe,
+  type IngredientItem,
+  type StepItem,
+} from "@/actions/recipe"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { ClockIcon, HeartIcon, TrashIcon, FlameIcon, UsersIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { ImageUpload } from "@/components/image-upload"
 
 type Recipe = {
   id: string
@@ -37,6 +44,7 @@ export function RecipeDetail({ recipe }: { recipe: Recipe }) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [isFav, setIsFav] = useState(recipe.isFavorite)
+  const [imageUrl, setImageUrl] = useState(recipe.imageUrl ?? "")
 
   const ingredients = recipe.ingredients as IngredientItem[]
   const steps = recipe.steps as StepItem[]
@@ -56,15 +64,25 @@ export function RecipeDetail({ recipe }: { recipe: Recipe }) {
     })
   }
 
+  const handleImageChange = (base64: string) => {
+    setImageUrl(base64)
+    startTransition(() => updateRecipe(recipe.id, { imageUrl: base64 || undefined }))
+  }
+
   return (
     <article className="space-y-6 pb-10">
-      {/* Hero image */}
-      {recipe.imageUrl && (
-        <div className="aspect-video rounded-xl overflow-hidden bg-secondary -mx-4">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={recipe.imageUrl} alt={recipe.title} className="size-full object-cover" />
+      {/* Hero image + upload */}
+      <div className="-mx-4">
+        {imageUrl ? (
+          <div className="relative aspect-video overflow-hidden bg-secondary">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={imageUrl} alt={recipe.title} className="size-full object-cover" />
+          </div>
+        ) : null}
+        <div className={cn("px-4", imageUrl ? "pt-3" : "pt-0")}>
+          <ImageUpload value={imageUrl} onChange={handleImageChange} />
         </div>
-      )}
+      </div>
 
       {/* Title & actions */}
       <div className="flex items-start justify-between gap-3">
@@ -197,6 +215,20 @@ export function RecipeDetail({ recipe }: { recipe: Recipe }) {
           </section>
         </>
       )}
+
+      {/* Delete */}
+      <Separator />
+      <div className="pt-2">
+        <Button
+          variant="ghost"
+          className="w-full text-destructive hover:text-destructive hover:bg-destructive/10 border border-destructive/30"
+          onClick={handleDelete}
+          disabled={isPending}
+        >
+          <TrashIcon className="size-4 mr-2" />
+          删除这道菜谱
+        </Button>
+      </div>
     </article>
   )
 }
